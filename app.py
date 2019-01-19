@@ -83,70 +83,11 @@ def launch_webserver(que):
     app.run(host='0.0.0.0', port=4018)
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        '-src',
-        '--source',
-        dest='video_source',
-        type=int,
-        default=0,
-        help='Device index of the camera.')
-    parser.add_argument(
-        '-nhands',
-        '--num_hands',
-        dest='num_hands',
-        type=int,
-        default=2,
-        help='Max number of hands to detect.')
-    parser.add_argument(
-        '-fps',
-        '--fps',
-        dest='fps',
-        type=int,
-        default=1,
-        help='Show FPS on detection/display visualization')
-    parser.add_argument(
-        '-wd',
-        '--width',
-        dest='width',
-        type=int,
-        default=750,
-        help='Width of the frames in the video stream.')
-    parser.add_argument(
-        '-ht',
-        '--height',
-        dest='height',
-        type=int,
-        default=500,
-        help='Height of the frames in the video stream.')
-    parser.add_argument(
-        '-ds',
-        '--display',
-        dest='display',
-        type=int,
-        default=1,
-        help='Display the detected images using OpenCV. This reduces FPS')
-    parser.add_argument(
-        '-num-w',
-        '--num-workers',
-        dest='num_workers',
-        type=int,
-        default=4,
-        help='Number of workers.')
-    parser.add_argument(
-        '-q-size',
-        '--queue-size',
-        dest='queue_size',
-        type=int,
-        default=5,
-        help='Size of the queue.')
-    args = parser.parse_args()
 
-    input_q = Queue(maxsize=args.queue_size)
-    output_q = Queue(maxsize=args.queue_size)
+    input_q = Queue(maxsize=5)
+    output_q = Queue(maxsize=5)
 
-    video_capture = WebcamVideoStream(
-        src=args.video_source, width=args.width, height=args.height).start()
+    video_capture = WebcamVideoStream(src=0, width=750, height=500).start()
 
     cap_params = {}
     frame_processed = 1
@@ -156,11 +97,8 @@ if __name__ == '__main__':
     # max number of hands we want to detect/track
     cap_params['num_hands_detect'] = 2
 
-    print(cap_params, args)
-
     # spin up workers to paralleize detection.
-    pool = Pool(args.num_workers, worker,
-                (input_q, output_q, cap_params, frame_processed, q))
+    pool = Pool(4, worker, (input_q, output_q, cap_params, frame_processed, q))
 
     start_time = datetime.datetime.now()
     num_frames = 0
@@ -185,29 +123,16 @@ if __name__ == '__main__':
         elapsed_time = (datetime.datetime.now() - start_time).total_seconds()
         num_frames += 1
         fps = num_frames / elapsed_time
-        # print("frame ",  index, num_frames, elapsed_time, fps)
 
-        if (output_frame is not None):
-            if (args.display > 0):
-                if (args.fps > 0):
-                    detector_utils.draw_fps_on_image("FPS : " + str(int(fps)),
-                                                     output_frame)
-                cv2.imshow('Multi-Threaded Detection', output_frame)
-                if cv2.waitKey(1) & 0xFF == ord('q'):
-                    break
-            else:
-                if (num_frames == 400):
-                    num_frames = 0
-                    start_time = datetime.datetime.now()
-                else:
-                    print("frames processed: ", index, "elapsed time: ",
-                          elapsed_time, "fps: ", str(int(fps)))
+        if output_frame is not None:
+            detector_utils.draw_fps_on_image("FPS : " + str(int(fps)), output_frame)
+            cv2.imshow('Multi-Threaded Detection', output_frame)
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
         else:
-            # print("video end")
             break
     elapsed_time = (datetime.datetime.now() - start_time).total_seconds()
     fps = num_frames / elapsed_time
-    print("fps", fps)
     pool.terminate()
     video_capture.stop()
     cv2.destroyAllWindows()
