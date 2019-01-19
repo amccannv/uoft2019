@@ -92,7 +92,8 @@ class SpeechHandler(object):
 
                 if re.search(r'\b(exit|quit)\b', transcript, re.I):
                     print('Exiting..')
-                    print(json.dumps(self._json_summary))
+                    with open('audio_summary.json', 'w') as outfile:
+                        json.dump(self._json_summary, outfile)
                     break
 
                 num_chars_printed = 0
