@@ -104,13 +104,19 @@ class VisionHandler(object):
         pool = Pool(4, worker, (input_q, output_q, cap_params, frame_processed, q))
 
         start_time = datetime.datetime.now()
+
+
+        cv2.namedWindow('Multi-Threaded Detection', cv2.WINDOW_NORMAL)
+
+        self.detection_loop(video_capture)
+
+    def detection_loop(self, video_capture):
         num_frames = 0
         fps = 0
         index = 0
 
-        cv2.namedWindow('Multi-Threaded Detection', cv2.WINDOW_NORMAL)
-
-    def detection_loop(self):
+        input_q = Queue(maxsize=5)
+        output_q = Queue(maxsize=5)
         while True:
             frame = video_capture.read()
             frame = cv2.flip(frame, 1)

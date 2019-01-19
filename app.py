@@ -67,10 +67,10 @@ def test_connect():
     print('Client connected')
 
     #Start the random number generator thread only if the thread has not been started before.
-    if not speech_thread.isAlive():
-        print("Starting Thread")
-        speech_thread = SpeechThread()
-        speech_thread.start()
+    # if not speech_thread.isAlive():
+    #     print("Starting Thread")
+    #     speech_thread = SpeechThread()
+    #     speech_thread.start()
     if not vision_thread.isAlive():
         print("Starting Thread")
         vision_thread = VisionThread()
