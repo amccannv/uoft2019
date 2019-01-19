@@ -4,6 +4,8 @@ from random import random
 from time import sleep
 from threading import Thread, Event
 import subprocess
+import multiprocessing
+from multiprocessing import Queue, Pool
 
 from speech import SpeechHandler
 from vision import VisionHandler
@@ -67,10 +69,10 @@ def test_connect():
     print('Client connected')
 
     #Start the random number generator thread only if the thread has not been started before.
-    # if not speech_thread.isAlive():
-    #     print("Starting Thread")
-    #     speech_thread = SpeechThread()
-    #     speech_thread.start()
+    if not speech_thread.isAlive():
+        print("Starting Thread")
+        speech_thread = SpeechThread()
+        speech_thread.start()
     if not vision_thread.isAlive():
         print("Starting Thread")
         vision_thread = VisionThread()
@@ -79,7 +81,6 @@ def test_connect():
 @socketio.on('disconnect', namespace='/test')
 def test_disconnect():
     print('Client disconnected')
-
 
 if __name__ == '__main__':
     socketio.run(app)

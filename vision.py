@@ -11,8 +11,6 @@ from threading import Thread
 
 from flask import Flask, request, jsonify
 
-
-
 # app = Flask(__name__)
 
 # # Create a worker thread that loads graph and
@@ -87,8 +85,8 @@ class VisionHandler(object):
         frame_processed = 0
         score_thresh = 0.2
         
-        input_q = Queue(maxsize=5)
-        output_q = Queue(maxsize=5)
+        self._input_q = Queue(maxsize=5)
+        self._output_q = Queue(maxsize=5)
 
         video_capture = WebcamVideoStream(src=0, width=750, height=500).start()
 
@@ -101,9 +99,9 @@ class VisionHandler(object):
         cap_params['num_hands_detect'] = 2
 
         # spin up workers to paralleize detection.
-        pool = Pool(4, worker, (input_q, output_q, cap_params, frame_processed, q))
+        self._pool = Pool(4, worker, (self._input_q, self._output_q, cap_params, frame_processed, q))
 
-        start_time = datetime.datetime.now()
+        
 
 
         cv2.namedWindow('Multi-Threaded Detection', cv2.WINDOW_NORMAL)
@@ -114,17 +112,15 @@ class VisionHandler(object):
         num_frames = 0
         fps = 0
         index = 0
+        start_time = datetime.datetime.now()
 
-        input_q = Queue(maxsize=5)
-        output_q = Queue(maxsize=5)
         while True:
             frame = video_capture.read()
             frame = cv2.flip(frame, 1)
             index += 1
 
-            input_q.put(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
-            output_frame = output_q.get()
-
+            self._input_q.put(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
+            output_frame = self._output_q.get()
             output_frame = cv2.cvtColor(output_frame, cv2.COLOR_RGB2BGR)
 
             elapsed_time = (datetime.datetime.now() - start_time).total_seconds()
@@ -140,6 +136,6 @@ class VisionHandler(object):
                 break
         elapsed_time = (datetime.datetime.now() - start_time).total_seconds()
         fps = num_frames / elapsed_time
-        pool.terminate()
+        self._pool.terminate()
         video_capture.stop()
         cv2.destroyAllWindows()
