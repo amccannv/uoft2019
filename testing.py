@@ -18,6 +18,7 @@ from flask import Flask, render_template, url_for, copy_current_request_context
 from random import random
 from time import sleep
 from threading import Thread, Event
+import subprocess
 
 
 __author__ = 'slynn'
@@ -52,7 +53,7 @@ class RandomThread(Thread):
             sleep(self.delay)
 
     def run(self):
-        self.randomNumberGenerator()
+        subprocess.run('python3 speech.py', shell=True)
 
 
 @app.route('/')
