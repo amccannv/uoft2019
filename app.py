@@ -13,7 +13,7 @@ app.config['DEBUG'] = True
 # turn the flask app into a socketio app
 socketio = SocketIO(app)
 
-#random number Generator Thread
+# audio thread
 speech_thread = Thread()
 speech_thread_stop_event = Event()
 
