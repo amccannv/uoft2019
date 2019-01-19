@@ -9,7 +9,12 @@ from datetime import datetime
 import cv2
 from utils import label_map_util
 from collections import defaultdict
+import math
+import requests
 
+total = 0
+old_point_first = None
+old_point_second = None
 
 detection_graph = tf.Graph()
 sys.path.append("..")
@@ -50,15 +55,33 @@ def load_inference_graph():
 
 # draw the detected bounding boxes on the images
 # You can modify this to also draw a label.
-def draw_box_on_image(num_hands_detect, score_thresh, scores, boxes, im_width, im_height, image_np):
-    for i in range(num_hands_detect):
-        if (scores[i] > score_thresh):
-            (left, right, top, bottom) = (boxes[i][1] * im_width, boxes[i][3] * im_width,
-                                          boxes[i][0] * im_height, boxes[i][2] * im_height)
-            p1 = (int(left), int(top))
-            p2 = (int(right), int(bottom))
-            cv2.rectangle(image_np, p1, p2, (77, 255, 9), 3, 1)
+def draw_box_on_image(hand_num, score_thresh, scores, boxes, im_width, im_height, image_np, frame_processed):
+    global total
+    global old_point_first
+    global old_point_second
+    if (scores[hand_num] > score_thresh):
+        (left, right, top, bottom) = (boxes[hand_num][1] * im_width, boxes[hand_num][3] * im_width,
+                                      boxes[hand_num][0] * im_height, boxes[hand_num][2] * im_height)
+        p1 = (int(left), int(top))
+        p2 = (int(right), int(bottom))
+        if hand_num == 0:
 
+            if old_point_first is None:
+                old_point_first = p1
+            elif frame_processed % 5 == 0:
+                total += math.sqrt(((p1[0]-old_point_first[0])**2)+((p1[1]-old_point_first[1])**2))
+                old_point_first = p1
+                # requests.post(url = 'http://localhost:4001/movement', data = data)
+        else:
+            if old_point_second is None:
+                old_point_second = p1
+            elif frame_processed % 5 == 0:
+                total += math.sqrt(((p1[0]-old_point_second[0])**2)+((p1[1]-old_point_second[1])**2))
+                old_point_second = p1
+                # requests.post(url = 'http://localhost:4001/movement', data = data)
+
+        cv2.rectangle(image_np, p1, p2, (77, 255, 9), 3, 1)
+        return total/frame_processed #might need to multiply to normalize
 
 # Show fps value on image.
 def draw_fps_on_image(fps, image_np):

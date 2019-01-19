@@ -9,25 +9,30 @@ import datetime
 import argparse
 from threading import Thread
 
-from flask import Flask
+from flask import Flask, request, jsonify
 
-frame_processed = 0
-score_thresh = 0.2
+# app = Flask(__name__)
 
-app = Flask(__name__)
+# # Create a worker thread that loads graph and
+# # does detection on images in an input queue and puts it on an output queue
 
-# Create a worker thread that loads graph and
-# does detection on images in an input queue and puts it on an output queue
+# @app.route("/")
+# def hello():
+#     return 'hi'
 
-@app.route("/")
-def hello():
-    return 'hi'
+# @app.route("/movement", methods=['GET'])
+# def movement_score():
+#     score = q.get()
+#     print("SCORE", score)
 
+#     return jsonify(score=score)
 
-def worker(input_q, output_q, cap_params, frame_processed):
+def worker(input_q, output_q, cap_params, frame_processed, q):
     print(">> loading frozen model for worker")
     detection_graph, sess = detector_utils.load_inference_graph()
     sess = tf.Session(graph=detection_graph)
+    ret1 = 0
+    ret2 = 0
     while True:
         #print("> ===== in worker loop, frame ", frame_processed)
         frame = input_q.get()
@@ -39,10 +44,28 @@ def worker(input_q, output_q, cap_params, frame_processed):
             boxes, scores = detector_utils.detect_objects(
                 frame, detection_graph, sess)
             # draw bounding boxes
-            detector_utils.draw_box_on_image(
-                cap_params['num_hands_detect'], cap_params["score_thresh"],
+
+            ret = detector_utils.draw_box_on_image(
+                0, cap_params["score_thresh"],
+                scores, boxes, cap_params['im_width'], cap_params['im_height'], frame, frame_processed)
+
+
+            if ret is not None:
+                ret1 = ret
+
+            ret = detector_utils.draw_box_on_image(
+                1, cap_params["score_thresh"],
                 scores, boxes, cap_params['im_width'], cap_params['im_height'],
-                frame)
+                frame, frame_processed)
+
+            if ret is not None:
+                ret2 = ret
+
+            score = (ret1 + ret2)/2
+            if ret is not None:
+                print(score, q.get())
+            q.put(score)
+            # print(q.get())
             # add frame annotated with bounding box to queue
             output_q.put(frame)
             frame_processed += 1
@@ -50,135 +73,69 @@ def worker(input_q, output_q, cap_params, frame_processed):
             output_q.put(frame)
     sess.close()
 
-def launch_webserver():
-    app.run(host='0.0.0.0', port=4000)
+# def launch_webserver(que):
+#     global q
+#     q = que
+#     app.run(host='0.0.0.0', port=4018)
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        '-src',
-        '--source',
-        dest='video_source',
-        type=int,
-        default=0,
-        help='Device index of the camera.')
-    parser.add_argument(
-        '-nhands',
-        '--num_hands',
-        dest='num_hands',
-        type=int,
-        default=2,
-        help='Max number of hands to detect.')
-    parser.add_argument(
-        '-fps',
-        '--fps',
-        dest='fps',
-        type=int,
-        default=1,
-        help='Show FPS on detection/display visualization')
-    parser.add_argument(
-        '-wd',
-        '--width',
-        dest='width',
-        type=int,
-        default=750,
-        help='Width of the frames in the video stream.')
-    parser.add_argument(
-        '-ht',
-        '--height',
-        dest='height',
-        type=int,
-        default=500,
-        help='Height of the frames in the video stream.')
-    parser.add_argument(
-        '-ds',
-        '--display',
-        dest='display',
-        type=int,
-        default=1,
-        help='Display the detected images using OpenCV. This reduces FPS')
-    parser.add_argument(
-        '-num-w',
-        '--num-workers',
-        dest='num_workers',
-        type=int,
-        default=4,
-        help='Number of workers.')
-    parser.add_argument(
-        '-q-size',
-        '--queue-size',
-        dest='queue_size',
-        type=int,
-        default=5,
-        help='Size of the queue.')
-    args = parser.parse_args()
+class VisionHandler(object):
+    def __init__(self):
+        q = Queue()
 
-    input_q = Queue(maxsize=args.queue_size)
-    output_q = Queue(maxsize=args.queue_size)
+        frame_processed = 0
+        score_thresh = 0.2
+        
+        self._input_q = Queue(maxsize=5)
+        self._output_q = Queue(maxsize=5)
 
-    video_capture = WebcamVideoStream(
-        src=args.video_source, width=args.width, height=args.height).start()
+        video_capture = WebcamVideoStream(src=0, width=750, height=500).start()
 
-    cap_params = {}
-    frame_processed = 0
-    cap_params['im_width'], cap_params['im_height'] = video_capture.size()
-    cap_params['score_thresh'] = score_thresh
+        cap_params = {}
+        frame_processed = 1
+        cap_params['im_width'], cap_params['im_height'] = video_capture.size()
+        cap_params['score_thresh'] = score_thresh
 
-    # max number of hands we want to detect/track
-    cap_params['num_hands_detect'] = args.num_hands
+        # max number of hands we want to detect/track
+        cap_params['num_hands_detect'] = 2
 
-    print(cap_params, args)
+        # spin up workers to paralleize detection.
+        self._pool = Pool(4, worker, (self._input_q, self._output_q, cap_params, frame_processed, q))
 
-    # spin up workers to paralleize detection.
-    pool = Pool(args.num_workers, worker,
-                (input_q, output_q, cap_params, frame_processed))
+        
 
-    start_time = datetime.datetime.now()
-    num_frames = 0
-    fps = 0
-    index = 0
 
-    cv2.namedWindow('Multi-Threaded Detection', cv2.WINDOW_NORMAL)
+        cv2.namedWindow('Multi-Threaded Detection', cv2.WINDOW_NORMAL)
 
-    # run web application
-    Thread(target=launch_webserver).start()
+        self.detection_loop(video_capture)
 
-    while True:
-        frame = video_capture.read()
-        frame = cv2.flip(frame, 1)
-        index += 1
+    def detection_loop(self, video_capture):
+        num_frames = 0
+        fps = 0
+        index = 0
+        start_time = datetime.datetime.now()
 
-        input_q.put(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
-        output_frame = output_q.get()
+        while True:
+            frame = video_capture.read()
+            frame = cv2.flip(frame, 1)
+            index += 1
 
-        output_frame = cv2.cvtColor(output_frame, cv2.COLOR_RGB2BGR)
+            self._input_q.put(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
+            output_frame = self._output_q.get()
+            output_frame = cv2.cvtColor(output_frame, cv2.COLOR_RGB2BGR)
 
-        elapsed_time = (datetime.datetime.now() - start_time).total_seconds()
-        num_frames += 1
-        fps = num_frames / elapsed_time
-        # print("frame ",  index, num_frames, elapsed_time, fps)
+            elapsed_time = (datetime.datetime.now() - start_time).total_seconds()
+            num_frames += 1
+            fps = num_frames / elapsed_time
 
-        if (output_frame is not None):
-            if (args.display > 0):
-                if (args.fps > 0):
-                    detector_utils.draw_fps_on_image("FPS : " + str(int(fps)),
-                                                     output_frame)
+            if output_frame is not None:
+                detector_utils.draw_fps_on_image("FPS : " + str(int(fps)), output_frame)
                 cv2.imshow('Multi-Threaded Detection', output_frame)
                 if cv2.waitKey(1) & 0xFF == ord('q'):
                     break
             else:
-                if (num_frames == 400):
-                    num_frames = 0
-                    start_time = datetime.datetime.now()
-                else:
-                    print("frames processed: ", index, "elapsed time: ",
-                          elapsed_time, "fps: ", str(int(fps)))
-        else:
-            # print("video end")
-            break
-    elapsed_time = (datetime.datetime.now() - start_time).total_seconds()
-    fps = num_frames / elapsed_time
-    print("fps", fps)
-    pool.terminate()
-    video_capture.stop()
-    cv2.destroyAllWindows()
+                break
+        elapsed_time = (datetime.datetime.now() - start_time).total_seconds()
+        fps = num_frames / elapsed_time
+        self._pool.terminate()
+        video_capture.stop()
+        cv2.destroyAllWindows()
