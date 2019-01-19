@@ -70,6 +70,7 @@ def worker(input_q, output_q, cap_params, frame_processed, q):
             if ret is not None:
                 print(score, q.get())
             q.put(score)
+            # print(q.get())
             # add frame annotated with bounding box to queue
             output_q.put(frame)
             frame_processed += 1
