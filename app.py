@@ -9,7 +9,9 @@ import datetime
 import argparse
 from threading import Thread
 
-from flask import Flask
+from flask import Flask, request, jsonify
+
+score = 0
 
 frame_processed = 0
 score_thresh = 0.2
@@ -23,11 +25,20 @@ app = Flask(__name__)
 def hello():
     return 'hi'
 
+@app.route("/movement", methods=['GET','POST'])
+def movement_score():
+    global score
+    if request.method == 'POST':
+        posted_data = request.get_json()
+        score = posted_data['movement_score']
+
+    return jsonify(score=score)
 
 def worker(input_q, output_q, cap_params, frame_processed):
     print(">> loading frozen model for worker")
     detection_graph, sess = detector_utils.load_inference_graph()
     sess = tf.Session(graph=detection_graph)
+
     while True:
         #print("> ===== in worker loop, frame ", frame_processed)
         frame = input_q.get()
@@ -40,9 +51,14 @@ def worker(input_q, output_q, cap_params, frame_processed):
                 frame, detection_graph, sess)
             # draw bounding boxes
             detector_utils.draw_box_on_image(
-                cap_params['num_hands_detect'], cap_params["score_thresh"],
+                0, cap_params["score_thresh"],
+                scores, boxes, cap_params['im_width'], cap_params['im_height'], frame, frame_processed)
+
+            detector_utils.draw_box_on_image(
+                1, cap_params["score_thresh"],
                 scores, boxes, cap_params['im_width'], cap_params['im_height'],
-                frame)
+                frame, frame_processed)
+
             # add frame annotated with bounding box to queue
             output_q.put(frame)
             frame_processed += 1
@@ -51,7 +67,7 @@ def worker(input_q, output_q, cap_params, frame_processed):
     sess.close()
 
 def launch_webserver():
-    app.run(host='0.0.0.0', port=4000)
+    app.run(host='0.0.0.0', port=4014)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -125,7 +141,7 @@ if __name__ == '__main__':
     cap_params['score_thresh'] = score_thresh
 
     # max number of hands we want to detect/track
-    cap_params['num_hands_detect'] = args.num_hands
+    cap_params['num_hands_detect'] = 2
 
     print(cap_params, args)
 
