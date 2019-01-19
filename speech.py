@@ -27,6 +27,7 @@ from __future__ import division
 
 import re
 import sys
+import json
 
 from google.cloud import speech
 from google.cloud.speech import enums
@@ -39,7 +40,7 @@ from microphoneStream import MicrophoneStream
 # Audio recording parameters
 RATE = 16000
 CHUNK = int(RATE / 10)  # 100ms
-FILLER_WORDS = ['basically', 'really', 'like', 'actually', 'very', 'literally', 'stuff', 'things', 'obviously', 'yeah']
+CRUTCH_WORDS = ['basically', 'really', 'like', 'actually', 'very', 'literally', 'stuff', 'things', 'obviously', 'yeah']
 
 class SpeechHandler(object):
     def listen_print_loop(self, responses):
@@ -91,20 +92,32 @@ class SpeechHandler(object):
 
                 if re.search(r'\b(exit|quit)\b', transcript, re.I):
                     print('Exiting..')
+                    print(json.dumps(self._json_summary))
                     break
 
                 num_chars_printed = 0
 
     def fillerStats(self, transcript):
-        filler_word_count = 0
-        for word in FILLER_WORDS:
-            filler_word_count = filler_word_count + transcript.count(word)
-        return filler_word_count / len(transcript.split()) * 100
+        crutch_word_count = 0
+        for word in CRUTCH_WORDS:
+            crutch_word_count = crutch_word_count + transcript.count(word)
+            self._json_summary['counts'][word] += transcript.count(word)
+
+        self._json_summary['transcript'] = self._json_summary['transcript'] + transcript
+        self._json_summary['crutch_count_by_line'].append(crutch_word_count)
+        self._json_summary['wpm_by_line'].append(0)
+
+        return crutch_word_count / len(transcript.split()) * 100
 
     def __init__(self, socket):
         # See http://g.co/cloud/speech/docs/languages
         # for a list of supported languages.
         self._socket = socket
+        self._json_summary = {'transcript': '',
+                              'crutch_count_by_line': [],
+                              'wpm_by_line': [],
+                              'counts': {'basically': 0, 'really': 0, 'like': 0, 'actually': 0, 'very': 0, 'literally': 0, 'stuff': 0, 'things': 0, 'obviously': 0, 'yeah': 0}
+                              }
         language_code = 'en-US'  # a BCP-47 language tag
 
         client = speech.SpeechClient()
