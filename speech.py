@@ -37,7 +37,7 @@ from six.moves import queue
 # Audio recording parameters
 RATE = 16000
 CHUNK = int(RATE / 10)  # 100ms
-
+FILLER_WORDS = ['basically', 'really', 'like', 'actually', 'very', 'literally', 'stuff', 'things', 'obviously', 'yeah']
 
 class MicrophoneStream(object):
     """Opens a recording stream as a generator yielding the audio chunks."""
@@ -149,9 +149,7 @@ def listen_print_loop(responses):
 
             # Exit recognition if any of the transcribed phrases could be
             # one of our keywords.
-            if re.search(r'\b(like)\b', transcript, re.I):
-                count = transcript.count('like')
-                print(count)
+            print(fillerStats(transcript))
 
             if re.search(r'\b(exit|quit)\b', transcript, re.I):
                 print('Exiting..')
@@ -159,6 +157,11 @@ def listen_print_loop(responses):
 
             num_chars_printed = 0
 
+def fillerStats(transcript):
+    filler_word_count = 0
+    for word in FILLER_WORDS:
+        filler_word_count = filler_word_count + transcript.count(word)
+    return filler_word_count / len(transcript.split()) * 100
 
 def main():
     # See http://g.co/cloud/speech/docs/languages
@@ -182,7 +185,10 @@ def main():
         responses = client.streaming_recognize(streaming_config, requests)
 
         # Now, put the transcription responses to use.
-        listen_print_loop(responses)
+        try:
+            listen_print_loop(responses)
+        except Exception as exception:
+            print("Exception handle: Exceeded maximum allowed stream duration of 65 seconds")
 
 
 if __name__ == '__main__':
