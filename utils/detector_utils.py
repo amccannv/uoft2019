@@ -71,7 +71,6 @@ def draw_box_on_image(hand_num, score_thresh, scores, boxes, im_width, im_height
             elif frame_processed % 5 == 0:
                 total += math.sqrt(((p1[0]-old_point_first[0])**2)+((p1[1]-old_point_first[1])**2))
                 old_point_first = p1
-                data = {'movement_score': total / frame_processed} #might need to multiply by something to normalize
                 # requests.post(url = 'http://localhost:4001/movement', data = data)
         else:
             if old_point_second is None:
@@ -79,11 +78,10 @@ def draw_box_on_image(hand_num, score_thresh, scores, boxes, im_width, im_height
             elif frame_processed % 5 == 0:
                 total += math.sqrt(((p1[0]-old_point_second[0])**2)+((p1[1]-old_point_second[1])**2))
                 old_point_second = p1
-                data = {'movement_score': total / frame_processed} #might need to multiply by something to normalize
                 # requests.post(url = 'http://localhost:4001/movement', data = data)
 
         cv2.rectangle(image_np, p1, p2, (77, 255, 9), 3, 1)
-
+        return total/frame_processed #might need to multiply to normalize
 
 # Show fps value on image.
 def draw_fps_on_image(fps, image_np):

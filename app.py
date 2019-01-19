@@ -11,7 +11,7 @@ from threading import Thread
 
 from flask import Flask, request, jsonify
 
-score = 0
+q = Queue()
 
 frame_processed = 0
 score_thresh = 0.2
@@ -25,20 +25,19 @@ app = Flask(__name__)
 def hello():
     return 'hi'
 
-@app.route("/movement", methods=['GET','POST'])
+@app.route("/movement", methods=['GET'])
 def movement_score():
-    global score
-    if request.method == 'POST':
-        posted_data = request.get_json()
-        score = posted_data['movement_score']
+    score = q.get()
+    print("SCORE", score)
 
     return jsonify(score=score)
 
-def worker(input_q, output_q, cap_params, frame_processed):
+def worker(input_q, output_q, cap_params, frame_processed, q):
     print(">> loading frozen model for worker")
     detection_graph, sess = detector_utils.load_inference_graph()
     sess = tf.Session(graph=detection_graph)
-
+    ret1 = 0
+    ret2 = 0
     while True:
         #print("> ===== in worker loop, frame ", frame_processed)
         frame = input_q.get()
@@ -50,15 +49,27 @@ def worker(input_q, output_q, cap_params, frame_processed):
             boxes, scores = detector_utils.detect_objects(
                 frame, detection_graph, sess)
             # draw bounding boxes
-            detector_utils.draw_box_on_image(
+
+            ret = detector_utils.draw_box_on_image(
                 0, cap_params["score_thresh"],
                 scores, boxes, cap_params['im_width'], cap_params['im_height'], frame, frame_processed)
 
-            detector_utils.draw_box_on_image(
+
+            if ret is not None:
+                ret1 = ret
+
+            ret = detector_utils.draw_box_on_image(
                 1, cap_params["score_thresh"],
                 scores, boxes, cap_params['im_width'], cap_params['im_height'],
                 frame, frame_processed)
 
+            if ret is not None:
+                ret2 = ret
+
+            score = (ret1 + ret2)/2
+            if ret is not None:
+                print(score, q.get())
+            q.put(score)
             # add frame annotated with bounding box to queue
             output_q.put(frame)
             frame_processed += 1
@@ -66,8 +77,10 @@ def worker(input_q, output_q, cap_params, frame_processed):
             output_q.put(frame)
     sess.close()
 
-def launch_webserver():
-    app.run(host='0.0.0.0', port=4014)
+def launch_webserver(que):
+    global q
+    q = que
+    app.run(host='0.0.0.0', port=4018)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -136,7 +149,7 @@ if __name__ == '__main__':
         src=args.video_source, width=args.width, height=args.height).start()
 
     cap_params = {}
-    frame_processed = 0
+    frame_processed = 1
     cap_params['im_width'], cap_params['im_height'] = video_capture.size()
     cap_params['score_thresh'] = score_thresh
 
@@ -147,7 +160,7 @@ if __name__ == '__main__':
 
     # spin up workers to paralleize detection.
     pool = Pool(args.num_workers, worker,
-                (input_q, output_q, cap_params, frame_processed))
+                (input_q, output_q, cap_params, frame_processed, q))
 
     start_time = datetime.datetime.now()
     num_frames = 0
@@ -157,7 +170,7 @@ if __name__ == '__main__':
     cv2.namedWindow('Multi-Threaded Detection', cv2.WINDOW_NORMAL)
 
     # run web application
-    Thread(target=launch_webserver).start()
+    Thread(target=launch_webserver, args=(q,)).start()
 
     while True:
         frame = video_capture.read()
