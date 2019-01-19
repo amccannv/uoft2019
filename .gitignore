@@ -4,3 +4,4 @@ env
 *.pyc
 UofT*
 audio_summary.json
+scores.txt

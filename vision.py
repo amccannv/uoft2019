@@ -8,26 +8,11 @@ from utils.detector_utils import WebcamVideoStream
 import datetime
 import argparse
 from threading import Thread
+import os
 
 from flask import Flask, request, jsonify
 
-# app = Flask(__name__)
-
-# # Create a worker thread that loads graph and
-# # does detection on images in an input queue and puts it on an output queue
-
-# @app.route("/")
-# def hello():
-#     return 'hi'
-
-# @app.route("/movement", methods=['GET'])
-# def movement_score():
-#     score = q.get()
-#     print("SCORE", score)
-
-#     return jsonify(score=score)
-
-def worker(input_q, output_q, cap_params, frame_processed, q):
+def worker(input_q, output_q, cap_params, frame_processed):
     print(">> loading frozen model for worker")
     detection_graph, sess = detector_utils.load_inference_graph()
     sess = tf.Session(graph=detection_graph)
@@ -61,11 +46,9 @@ def worker(input_q, output_q, cap_params, frame_processed, q):
             if ret is not None:
                 ret2 = ret
 
-            score = (ret1 + ret2)/2
-            if ret is not None:
-                print(score, q.get())
-            q.put(score)
-            # print(q.get())
+            score = (ret1 + ret2) / 2
+            with open('scores.txt', 'a+') as outfile:
+                outfile.write(str(score) + '\n')
             # add frame annotated with bounding box to queue
             output_q.put(frame)
             frame_processed += 1
@@ -80,7 +63,8 @@ def worker(input_q, output_q, cap_params, frame_processed, q):
 
 class VisionHandler(object):
     def __init__(self):
-        q = Queue()
+        if os.path.exists('scores.txt'):
+            os.remove('scores.txt')
 
         frame_processed = 0
         score_thresh = 0.2
@@ -99,10 +83,7 @@ class VisionHandler(object):
         cap_params['num_hands_detect'] = 2
 
         # spin up workers to paralleize detection.
-        self._pool = Pool(4, worker, (self._input_q, self._output_q, cap_params, frame_processed, q))
-
-        
-
+        self._pool = Pool(4, worker, (self._input_q, self._output_q, cap_params, frame_processed))
 
         cv2.namedWindow('Multi-Threaded Detection', cv2.WINDOW_NORMAL)
 

@@ -25,14 +25,6 @@ class SpeechThread(Thread):
         self.delay = 1
         super(SpeechThread, self).__init__()
 
-    # def speechStreaming(self):
-
-    #     while not speech_thread_stop_event.isSet():
-    #         number = round(random()*10, 3)
-    #         print(number)
-    #         socketio.emit('newnumber', {'number': number}, namespace='/test')
-    #         sleep(self.delay)
-
     def run(self):
         SpeechHandler(socketio)
 
@@ -43,14 +35,6 @@ class VisionThread(Thread):
     def __init__(self):
         self.delay = 1
         super(VisionThread, self).__init__()
-
-    # def speechStreaming(self):
-
-    #     while not speech_thread_stop_event.isSet():
-    #         number = round(random()*10, 3)
-    #         print(number)
-    #         socketio.emit('newnumber', {'number': number}, namespace='/test')
-    #         sleep(self.delay)
 
     def run(self):
         VisionHandler()
