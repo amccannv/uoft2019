@@ -75,6 +75,8 @@ def summary():
 
 @app.route('/current', methods=['GET'])
 def current():
+    global start_time
+
     with open('audio_summary.json') as f:
         data = json.load(f)
     scores = []
@@ -83,6 +85,8 @@ def current():
             if int(float(score.strip())) != 0:
                 scores.append(score)
     data['scores'] = scores
+    data['wpm_by_line'].append(len(data['transcript'][-1].split()) / (time() - start_time))
+    start_time = time()
     return jsonify(data)
 
 if __name__ == '__main__':

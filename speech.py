@@ -106,7 +106,6 @@ class SpeechHandler(object):
 
         self._json_summary['transcript'] = self._json_summary['transcript'] + transcript
         self._json_summary['crutch_count_by_line'].append(crutch_word_count)
-        self._json_summary['wpm_by_line'].append(0)
 
         with open('audio_summary.json', 'w') as outfile:
             json.dump(self._json_summary, outfile)
