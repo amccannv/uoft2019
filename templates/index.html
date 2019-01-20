@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<script src="//code.jquery.com/jquery-3.3.1.min.js"></script>
+<script src="static/js/application.js"></script>
 <!-- <link rel="stylesheet" href="https://www.w3schools.com/lib/w3-theme-teal.css"> -->
 <link rel="stylesheet" href="./static/css/ribbon.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.3.0/css/font-awesome.min.css">
@@ -32,6 +34,7 @@
     <div class="w3-center">
       <h4></h4>
       <button class="w3-btn w3-xlarge w3-dark-grey w3-hover-light-grey" onclick="startThreads()">START</button>
+
       <button class="w3-btn w3-xlarge w3-dark-grey w3-hover-light-grey" onclick="stopThreads()">STOP</button>
       <div class="w3-card w3-container" style="min-height:240px">
         <svg preserveAspectRatio="none" id="visualizer" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -53,6 +56,8 @@
 
         <h1>In <a href="https://codepen.io/zapplebee/full/gbNbZE/">Full Page view</a>, please allow the use of your microphone</h1>
       </div>
+
+      <a href="http://localhost:5000/summary" class="w3-btn w3-xlarge w3-dark-grey w3-hover-light-grey">STOP</a>
         <div class="w3-padding-32"></div>
     </div>
   </div>
@@ -106,17 +111,16 @@ function startThreads() {
     xhr.open('POST', 'http://localhost:5000/start');
     xhr.send();
 }
-
-function stopThreads() {
-    var xhr = new XMLHttpRequest();
-    xhr.onreadystatechange = function () {
-        if (xhr.readyState === 4) {
-            console.log(xhr.response);
-        }
-    }
-    xhr.open('POST', 'http://localhost:5000/stop');
-    xhr.send();
-}
+// function stopThreads() {
+//     var xhr = new XMLHttpRequest();
+//     xhr.onreadystatechange = function () {
+//         if (xhr.readyState === 4) {
+//             console.log(xhr.response);
+//         }
+//     }
+//     xhr.open('POST', 'http://localhost:5000/stop');
+//     xhr.send();
+// }
 
 // // Side navigation
 // function w3_open() {
@@ -235,7 +239,6 @@ window.onload = function () {
               	adjustedLength = Math.floor(frequencyArray[i]) - (Math.floor(frequencyArray[i]) % 5);
                 paths[i].setAttribute('d', 'M '+ (i) +',255 l 0,-' + adjustedLength);
             }
-
         }
         doDraw();
     }
