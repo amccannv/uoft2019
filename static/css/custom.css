@@ -1,0 +1,21 @@
+body {
+  height: 100%;
+}
+
+.navbar {
+	width: 100%;
+}
+
+.big-container {
+  display: flex;
+  align-items: space-around;
+  justify-content: space-around;
+}
+
+.live-bars {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
+  height: 100%;
+}

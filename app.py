@@ -52,15 +52,15 @@ def test_connect():
     global vision_thread
     print('Client connected')
 
-    #Start the random number generator thread only if the thread has not been started before.
-    if not speech_thread.isAlive():
-        print("Starting Thread")
-        speech_thread = SpeechThread()
-        speech_thread.start()
-    if not vision_thread.isAlive():
-        print("Starting Thread")
-        vision_thread = VisionThread()
-        vision_thread.start()
+    # #Start the random number generator thread only if the thread has not been started before.
+    # if not speech_thread.isAlive():
+    #     print("Starting Thread")
+    #     speech_thread = SpeechThread()
+    #     speech_thread.start()
+    # if not vision_thread.isAlive():
+    #     print("Starting Thread")
+    #     vision_thread = VisionThread()
+    #     vision_thread.start()
 
 @socketio.on('disconnect', namespace='/test')
 def test_disconnect():
