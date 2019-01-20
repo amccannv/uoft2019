@@ -46,38 +46,27 @@ def index():
 def start():
     global speech_thread
     global vision_thread
-<<<<<<< HEAD
     print('Client connected')
 
     # #Start the random number generator thread only if the thread has not been started before.
-=======
-    
->>>>>>> c71ff6c4cb8f451fdda75d455ac74ed6c01048ce
+
     if not speech_thread.isAlive():
         print("Starting Thread")
         speech_thread = SpeechThread()
         speech_thread.start()
-<<<<<<< HEAD
+
     # if not vision_thread.isAlive():
     #     print("Starting Thread")
     #     vision_thread = VisionThread()
     #     vision_thread.start()
 
-@socketio.on('disconnect', namespace='/test')
-def test_disconnect():
-    print('Client disconnected')
-=======
-    if not vision_thread.isAlive():
-        print("Starting Thread")
-        vision_thread = VisionThread()
-        vision_thread.start()
+
 
 @app.route('/stop')
 def stop():
     print('hold')
     # stop logic
     # render summary
->>>>>>> c71ff6c4cb8f451fdda75d455ac74ed6c01048ce
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0')
