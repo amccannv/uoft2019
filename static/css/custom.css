@@ -1,0 +1,53 @@
+html,
+body {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+
+.navbar {
+	width: 100%;
+}
+
+.big-container {
+  display: flex;
+  align-content: space-around;
+  justify-content: space-around;
+  flex-flow: row;
+  height: 80%;
+}
+
+.white-space {
+  flex-grow: 3
+}
+
+.live-bars {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
+  flex-grow: 2.5
+}
+
+.footer {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-content: center;
+}
+
+.ldBar {
+  display: flex;
+}
+
+.bar {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-content: space-around;
+}
+
+.bar img {
+  max-width: 100px;
+  max-height: 100px;
+}

@@ -3,9 +3,8 @@ __pycache__/
 env
 *.pyc
 UofT*
-<<<<<<< HEAD
+audio_summary.json
+scores.txt
 *.ipynb
 .ipynb_checkpoints
-=======
 audio_summary.json
->>>>>>> f953a53c4373c5f636799ff08069c0307d5e5f0d
