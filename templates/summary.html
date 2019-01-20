@@ -1,8 +1,120 @@
 <!DOCTYPE html>
 <html>
-<head>
-</head>
- <body>
-   <h1 class="logo">Results</h1>
- </body>
+	<head>
+		<link rel="stylesheet" type="text/css" href="ribbon.css" />
+		<script src= "https://cdn.zingchart.com/zingchart.min.js"></script>
+		<script> zingchart.MODULESDIR = "https://cdn.zingchart.com/modules/";
+		ZC.LICENSE = ["569d52cefae586f634c54f86dc99e6a9","ee6b7db5b51705a13dc2339db3edaf6d"];</script></head>
+	<body>
+		<div id='myChart'><a class="zc-ref" href="https://www.zingchart.com/">Charts by ZingChart</a></div>
+	</body>
+	<script>
+    <!-- REALTIME MOVE -->
+		window.feed = function(callback) {
+  var tick = {};
+  tick.plot0 = Math.ceil(0 + (Math.random() * 80));
+  callback(JSON.stringify(tick));
+};
+
+var myConfig = {
+ 	type: "gauge",
+ 	globals: {
+ 	  fontSize: 25
+ 	},
+ 	plotarea:{
+ 	  marginTop:80
+ 	},
+ 	plot:{
+ 	  size:'100%',
+ 	  valueBox: {
+ 	    placement: 'center',
+ 	    text:'%v', //default
+ 	    fontSize:35,
+ 	    rules:[
+ 	      {
+ 	        rule: '%v >= 55',
+ 	        text: '%v<br>Too fast'
+ 	      },
+ 	      {
+ 	        rule: '%v <= 55 && %v > 25',
+ 	        text: '%v<br>Good Pace'
+ 	      },
+ 	      {
+ 	        rule: '%v < 25',
+ 	        text: '%v<br>Too slow'
+ 	      }
+ 	    ]
+ 	  }
+ 	},
+  tooltip:{
+    borderRadius:5
+  },
+ 	scaleR:{
+	  aperture:100,
+	  minValue:0,
+	  maxValue:80,
+	  step:20,
+	  center:{
+	    visible:false
+	  },
+	  tick:{
+	    visible:false
+	  },
+	  item:{
+	    offsetR:0,
+	    rules:[
+	      {
+	        rule:'%i == 9',
+	        offsetX:15
+	      }
+	    ]
+	  },
+	  labels:['0', '20','40', '60', '80'],
+	  ring:{
+	    size:50,
+	    rules:[
+	      {
+	        rule:'%v < 20',
+	        backgroundColor:'#ffff99'
+	      },
+	      {
+	        rule:'%v >= 20 && %v < 55',
+	        backgroundColor:'#ccff99'
+	      },
+	      {
+	        rule:'%v >= 55',
+	        backgroundColor:'#ff6666'
+	      }
+	    ]
+	  }
+ 	},
+  refresh:{
+      type:"feed",
+      transport:"js",
+      url:"feed()",
+      interval:1500,
+      resetTimeout:1000
+  },
+	series : [
+		{
+			values : [0], // starting value
+			backgroundColor:'black',
+	    indicator:[10,10,10,10,0.75],
+	    animation:{
+        effect:2,
+        method:1,
+        sequence:4,
+        speed: 900
+     },
+		}
+	]
+};
+
+zingchart.render({
+	id : 'myChart',
+	data : myConfig,
+	height: 500,
+	width: '100%'
+});
+	</script>
 </html>

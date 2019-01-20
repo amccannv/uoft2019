@@ -14,3 +14,5 @@ $(document).ready(function() {
 
     setTimeout(getCurrent, 2000);
 });
+
+$('#crutch')

@@ -6,6 +6,10 @@
 <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 <script src="//code.jquery.com/jquery-3.3.1.min.js"></script>
 <script src="static/js/application.js"></script>
+<link rel="stylesheet" type="text/css" href="ribbon.css" />
+<script src= "https://cdn.zingchart.com/zingchart.min.js"></script>
+<script> zingchart.MODULESDIR = "https://cdn.zingchart.com/modules/";
+ZC.LICENSE = ["569d52cefae586f634c54f86dc99e6a9","ee6b7db5b51705a13dc2339db3edaf6d"];</script>
 <!-- <link rel="stylesheet" href="https://www.w3schools.com/lib/w3-theme-teal.css"> -->
 <link rel="stylesheet" href="./static/css/ribbon.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.3.0/css/font-awesome.min.css">
@@ -35,7 +39,8 @@
       <h4></h4>
       <button class="w3-btn w3-xlarge w3-dark-grey w3-hover-light-grey" onclick="startThreads()">START</button>
 
-      <button class="w3-btn w3-xlarge w3-dark-grey w3-hover-light-grey" onclick="stopThreads()">STOP</button>
+      <!-- <button class="w3-btn w3-xlarge w3-dark-grey w3-hover-light-grey" onclick="stopThreads()">STOP</button> -->
+      <a href="http://localhost:5000/summary" class="w3-btn w3-xlarge w3-dark-grey w3-hover-light-grey">STOP</a>
       <div class="w3-card w3-container" style="min-height:240px">
         <svg preserveAspectRatio="none" id="visualizer" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
             <defs>
@@ -57,7 +62,7 @@
         <h1>In <a href="https://codepen.io/zapplebee/full/gbNbZE/">Full Page view</a>, please allow the use of your microphone</h1>
       </div>
 
-      <a href="http://localhost:5000/summary" class="w3-btn w3-xlarge w3-dark-grey w3-hover-light-grey">STOP</a>
+      <!-- <a href="http://localhost:5000/summary" class="w3-btn w3-xlarge w3-dark-grey w3-hover-light-grey">STOP</a> -->
         <div class="w3-padding-32"></div>
     </div>
   </div>
@@ -76,7 +81,7 @@
     <div class="w3-card w3-container" style="min-height:400px">
       <h3>Crutch Words</h3><br>
       <img src='./static/img/fillerwords.png' width="175" height="125"/>
-      <p>[put the slider here]</p>
+      <p id='crutch'>[put the slider here]</p>
     </div>
   </div>
 
@@ -84,15 +89,16 @@
 <div class="w3-third">
   <div class="w3-card w3-container" style="min-height:400px">
     <h3>Movement Analysis</h3><br>
-    <img src='./static/img/movement.png' width="175" height="125"/>
+    <!-- <img src='./static/img/movement.png' width="175" height="125"/> -->
     <p>[put the slider here]</p>
+    <div id='myChart'></div>
   </div>
 </div>
 
 <!-- WPM -->
 <div class="w3-third">
   <div class="w3-card w3-container" style="min-height:400px">
-    <h3>Words Per Minute</h3><br>
+    <h3>Speech Speed</h3><br>
     <img src='./static/img/speed.png' width="175" height="125"/>
     <p>[put the slider here]</p>
   </div>
@@ -111,92 +117,10 @@ function startThreads() {
     xhr.open('POST', 'http://localhost:5000/start');
     xhr.send();
 }
-// function stopThreads() {
-//     var xhr = new XMLHttpRequest();
-//     xhr.onreadystatechange = function () {
-//         if (xhr.readyState === 4) {
-//             console.log(xhr.response);
-//         }
-//     }
-//     xhr.open('POST', 'http://localhost:5000/stop');
-//     xhr.send();
-// }
 
-// // Side navigation
-// function w3_open() {
-//   var x = document.getElementById("mySidebar");
-//   x.style.width = "100%";
-//   x.style.fontSize = "40px";
-//   x.style.paddingTop = "10%";
-//   x.style.display = "block";
-// }
-// function w3_close() {
-//   document.getElementById("mySidebar").style.display = "none";
-// }
-//
-// // Tabs
-// function openCity(evt, cityName) {
-//   var i;
-//   var x = document.getElementsByClassName("city");
-//   for (i = 0; i < x.length; i++) {
-//     x[i].style.display = "none";
-//   }
-//   var activebtn = document.getElementsByClassName("testbtn");
-//   for (i = 0; i < x.length; i++) {
-//     activebtn[i].className = activebtn[i].className.replace(" w3-dark-grey", "");
-//   }
-//   document.getElementById(cityName).style.display = "block";
-//   evt.currentTarget.className += " w3-dark-grey";
-// }
-//
-// var mybtn = document.getElementsByClassName("testbtn")[0];
-// mybtn.click();
-//
-// // Accordions
-// function myAccFunc(id) {
-//   var x = document.getElementById(id);
-//   if (x.className.indexOf("w3-show") == -1) {
-//     x.className += " w3-show";
-//   } else {
-//     x.className = x.className.replace(" w3-show", "");
-//   }
-// }
-//
-// // Slideshows
-// var slideIndex = 1;
-//
-// function plusDivs(n) {
-//   slideIndex = slideIndex + n;
-//   showDivs(slideIndex);
-// }
-//
-// function showDivs(n) {
-//   var x = document.getElementsByClassName("mySlides");
-//   if (n > x.length) {slideIndex = 1}
-//   if (n < 1) {slideIndex = x.length} ;
-//   for (i = 0; i < x.length; i++) {
-//     x[i].style.display = "none";
-//   }
-//   x[slideIndex-1].style.display = "block";
-// }
-//
-// showDivs(1);
-//
-// // Progress Bars
-// function move() {
-//   var elem = document.getElementById("myBar");
-//   var width = 5;
-//   var id = setInterval(frame, 10);
-//   function frame() {
-//     if (width == 100) {
-//       clearInterval(id);
-//     } else {
-//       width++;
-//       elem.style.width = width + '%';
-//       elem.innerHTML = width * 1  + '%';
-//     }
-//   }
-// }
+// update the crutch value!!!
+var element = document.getElementById("crutch");
+element.innerHTML = "New Heading"; // update with value from json
 
 // audio
 window.onload = function () {
@@ -256,6 +180,115 @@ window.onload = function () {
     navigator.getUserMedia({audio:true}, soundAllowed, soundNotAllowed);
 
 };
+
+// GAUGE
+<!-- REALTIME MOVE -->
+window.feed = function(callback) {
+var tick = {};
+tick.plot0 = Math.ceil(0 + (Math.random() * 80)); // replace this with the realtime values
+callback(JSON.stringify(tick));
+};
+
+var myConfig = {
+type: "gauge",
+globals: {
+fontSize: 24
+},
+plotarea:{
+marginTop:80
+},
+plot:{
+size:'100%',
+valueBox: {
+  placement: 'top',
+  text:'%v', //default
+  fontSize:24,
+  rules:[
+    {
+      rule: '%v >= 55',
+      text: '%v<br>Too Loose!'
+    },
+    {
+      rule: '%v <= 55 && %v > 25',
+      text: '%v<br>Keep It Up!'
+    },
+    {
+      rule: '%v < 25',
+      text: '%v<br>Too Stiff!'
+    }
+  ]
+}
+},
+tooltip:{
+borderRadius:5
+},
+scaleR:{
+aperture:100,
+minValue:0,
+maxValue:80,
+step:20,
+center:{
+  visible:false
+},
+tick:{
+  visible:false
+},
+item:{
+  offsetR:0,
+  rules:[
+    {
+      rule:'%i == 9',
+      offsetX:15
+    }
+  ]
+},
+labels:['0', '20','40', '60', '80'],
+ring:{
+  size:40,
+  rules:[
+    {
+      rule:'%v < 20',
+      backgroundColor:'#ffff99'
+    },
+    {
+      rule:'%v >= 20 && %v < 55',
+      backgroundColor:'#ccff99'
+    },
+    {
+      rule:'%v >= 55',
+      backgroundColor:'#ff6666'
+    }
+  ]
+}
+},
+refresh:{
+  type:"feed",
+  transport:"js",
+  url:"feed()",
+  interval:1500,
+  resetTimeout:1000
+},
+series : [
+{
+  values : [0], // starting value
+  backgroundColor:'black',
+  indicator:[8,1,10,10,0.75],
+  animation:{
+    effect:2,
+    method:1,
+    sequence:4,
+    speed: 900
+ },
+}
+]
+};
+
+zingchart.render({
+id : 'myChart',
+data : myConfig,
+height: 500,
+width: '100%'
+});
 </script>
 
 </body>
