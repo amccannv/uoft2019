@@ -8,6 +8,8 @@ from vision import VisionHandler
 
 app = Flask(__name__)
 app.config['DEBUG'] = True
+credential_path = "./UofT2019-37c5ae888676.json"
+os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = credential_path
 
 speech_thread = Thread()
 speech_thread_stop_event = Event()
@@ -44,6 +46,7 @@ def start():
         print("Starting Speech Thread")
         speech_thread = SpeechThread()
         speech_thread.start()
+
     if not vision_thread.isAlive():
         print("Starting Vision Thread")
         vision_thread = VisionThread()
