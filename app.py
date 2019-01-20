@@ -3,8 +3,9 @@ from multiprocessing import Pool
 import os
 from time import time, sleep
 from datetime import datetime, timedelta
+import json
 
-from flask import Flask, render_template
+from flask import Flask, render_template, redirect, url_for, jsonify
 
 from speech import SpeechHandler
 from vision import VisionHandler
@@ -60,20 +61,29 @@ def start():
 
     return "Started Threads"
 
-@app.route('/stop', methods=['POST'])
-def stop():
-    global speech_thread
-    global vision_thread
-    global start_time
+@app.route('/summary/', methods=['GET'])
+def summary():
+    with open('audio_summary.json') as f:
+        data = json.load(f)
+    scores = []
+    with open('scores.txt') as f:
+        for score in f:
+            if int(float(score.strip())) != 0:
+                scores.append(score)
+    data['scores'] = scores
+    return render_template('summary.html', data=data)
 
-    if speech_thread.isAlive():
-        print("Stopping Speech Thread")
-        speech_thread.stop()
-    if vision_thread.isAlive():
-        print("Stopping Vision Thread")
-        vision_thread.stop()
-
-    return "Stopped Threads"
+@app.route('/current', methods=['GET'])
+def current():
+    with open('audio_summary.json') as f:
+        data = json.load(f)
+    scores = []
+    with open('scores.txt') as f:
+        for score in f:
+            if int(float(score.strip())) != 0:
+                scores.append(score)
+    data['scores'] = scores
+    return jsonify(data)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0')
