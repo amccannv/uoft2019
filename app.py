@@ -5,7 +5,7 @@ from time import time, sleep
 from datetime import datetime, timedelta
 import json
 
-from flask import Flask, render_template
+from flask import Flask, render_template, redirect, url_for
 
 from speech import SpeechHandler
 from vision import VisionHandler
@@ -61,33 +61,17 @@ def start():
 
     return "Started Threads"
 
-@app.route('/stop', methods=['POST'])
-def stop():
-    global speech_thread
-    global vision_thread
-    global start_time
-
-    if speech_thread.isAlive():
-        print("Stopping Speech Thread")
-        speech_thread.stop()
-    if vision_thread.isAlive():
-        print("Stopping Vision Thread")
-        vision_thread.stop()
-
-    generateSummary()
-
-def generateSummary():
+@app.route('/summary/', methods=['GET'])
+def summary():
     with open('audio_summary.json') as f:
-        audio_data = json.load(f)
+        data = json.load(f)
     scores = []
     with open('scores.txt') as f:
         for score in f:
-            if int(score) != 0:
+            if int(float(score.strip())) != 0:
                 scores.append(score)
-    audio_data['scores'] = scores
-    summaryPage(data)
-
-def summaryPage(data):
+    data['scores'] = scores
+    print('yooooooooooooooooo')
     return render_template('summary.html', data=data)
 
 if __name__ == '__main__':
