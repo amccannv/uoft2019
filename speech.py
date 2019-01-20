@@ -29,8 +29,6 @@ import re
 import sys
 import json
 import subprocess
-from time import time, sleep
-from datetime import datetime, timedelta
 
 from google.cloud import speech
 from google.cloud.speech import enums
@@ -44,8 +42,6 @@ from microphoneStream import MicrophoneStream
 RATE = 16000
 CHUNK = int(RATE / 10)  # 100ms
 CRUTCH_WORDS = ['basically', 'really', 'like', 'actually', 'very', 'literally', 'stuff', 'things', 'obviously', 'yeah']
-
-timeNow = time()
 
 class SpeechHandler(object):
     def listen_print_loop(self, responses):
@@ -110,8 +106,7 @@ class SpeechHandler(object):
 
         self._json_summary['transcript'] = self._json_summary['transcript'] + transcript
         self._json_summary['crutch_count_by_line'].append(crutch_word_count)
-        self._json_summary['wpm_by_line'].append(len(transcript.split()) / (time() - timeNow))
-        timeNow = time()
+        self._json_summary['wpm_by_line'].append(0)
 
         with open('audio_summary.json', 'w') as outfile:
             json.dump(self._json_summary, outfile)

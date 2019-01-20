@@ -1,5 +1,8 @@
 from threading import Thread, Event
 from multiprocessing import Pool
+import os
+from time import time, sleep
+from datetime import datetime, timedelta
 
 from flask import Flask, render_template
 
@@ -17,6 +20,8 @@ speech_thread_stop_event = Event()
 vision_thread = Thread()
 vision_thread_stop_event = Event()
 
+start_time = time()
+
 class SpeechThread(Thread):
     def __init__(self):
         self.delay = 1
@@ -33,7 +38,7 @@ class VisionThread(Thread):
     def run(self):
         VisionHandler()
 
-@app.route('/', methods=['POST'])
+@app.route('/', methods=['GET'])
 def index():
     return render_template('index.html')
 
@@ -41,6 +46,7 @@ def index():
 def start():
     global speech_thread
     global vision_thread
+    global start_time
 
     if not speech_thread.isAlive():
         print("Starting Speech Thread")
@@ -58,6 +64,7 @@ def start():
 def stop():
     global speech_thread
     global vision_thread
+    global start_time
 
     if speech_thread.isAlive():
         print("Stopping Speech Thread")

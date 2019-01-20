@@ -43,6 +43,7 @@ def worker(input_q, output_q, cap_params, frame_processed):
                 ret2 = ret
 
             score = (ret1 + ret2) / 2
+            print(score)
             with open('scores.txt', 'a+') as outfile:
                 outfile.write(str(score) + '\n')
             # add frame annotated with bounding box to queue
@@ -66,12 +67,11 @@ class VisionHandler(object):
 
         # max number of hands we want to detect/track
         cap_params['num_hands_detect'] = 2
+        video_capture = WebcamVideoStream(src=0, width=750, height=500).start()
+        cap_params['im_width'], cap_params['im_height'] = video_capture.size()
 
         # spin up workers to paralleize detection.
         pool = Pool(4, worker, (input_q, output_q, cap_params, frame_processed))
-
-        video_capture = WebcamVideoStream(src=0, width=750, height=500).start()
-        cap_params['im_width'], cap_params['im_height'] = video_capture.size()
 
         start_time = datetime.datetime.now()
         num_frames = 0
@@ -85,24 +85,25 @@ class VisionHandler(object):
             frame = cv2.flip(frame, 1)
             index += 1
 
-        input_q.put(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
-        output_frame = output_q.get()
+            input_q.put(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
+            output_frame = output_q.get()
 
-        output_frame = cv2.cvtColor(output_frame, cv2.COLOR_RGB2BGR)
+            output_frame = cv2.cvtColor(output_frame, cv2.COLOR_RGB2BGR)
+
+            elapsed_time = (datetime.datetime.now() - start_time).total_seconds()
+            num_frames += 1
+            fps = num_frames / elapsed_time
+
+            if output_frame is not None:
+                detector_utils.draw_fps_on_image("FPS : " + str(int(fps)), output_frame)
+                cv2.imshow('Multi-Threaded Detection', output_frame)
+                if cv2.waitKey(1) & 0xFF == ord('q'):
+                    break
+            else:
+                break
 
         elapsed_time = (datetime.datetime.now() - start_time).total_seconds()
-        num_frames += 1
         fps = num_frames / elapsed_time
-
-        if output_frame is not None:
-            detector_utils.draw_fps_on_image("FPS : " + str(int(fps)), output_frame)
-            cv2.imshow('Multi-Threaded Detection', output_frame)
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                break
-        else:
-            break
-    elapsed_time = (datetime.datetime.now() - start_time).total_seconds()
-    fps = num_frames / elapsed_time
-    pool.terminate()
-    video_capture.stop()
-    cv2.destroyAllWindows()
+        pool.terminate()
+        video_capture.stop()
+        cv2.destroyAllWindows()
