@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+</head>
+ <body>
+   <h1 class="logo">Results</h1>
+
+   <ul>
+    {% for data in data %}
+    <li>{{data.file_name}}</li>
+    <li>{{data.set_min}}</li>
+    <li>{{data.rep_sec}}</li>
+    {% endfor %}
+   </ul>
+
+ </body>
+</html>

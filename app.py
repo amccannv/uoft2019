@@ -3,6 +3,7 @@ from multiprocessing import Pool
 import os
 from time import time, sleep
 from datetime import datetime, timedelta
+import json
 
 from flask import Flask, render_template
 
@@ -73,7 +74,21 @@ def stop():
         print("Stopping Vision Thread")
         vision_thread.stop()
 
-    return "Stopped Threads"
+    generateSummary()
+
+def generateSummary():
+    with open('audio_summary.json') as f:
+        audio_data = json.load(f)
+    scores = []
+    with open('scores.txt') as f:
+        for score in f:
+            if int(score) != 0:
+                scores.append(score)
+    audio_data['scores'] = scores
+    summaryPage(data)
+
+def summaryPage(data):
+    return render_template('summary.html', data=data)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0')
