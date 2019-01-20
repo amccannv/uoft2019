@@ -12,5 +12,5 @@ $(document).ready(function() {
         setTimeout(getCurrent, 2000);
     }
 
-    setTimeout(getCurrent, 10);
+    setTimeout(getCurrent, 2000);
 });
