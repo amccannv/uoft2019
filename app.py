@@ -86,6 +86,7 @@ def current():
                 scores.append(score)
     data['scores'] = scores
     data['wpm_by_line'].append(len(data['transcript'][-1].split()) / (time() - start_time))
+    start_time = time()
     return jsonify(data)
 
 if __name__ == '__main__':
