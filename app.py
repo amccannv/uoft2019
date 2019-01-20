@@ -6,12 +6,15 @@ from threading import Thread, Event
 import subprocess
 import multiprocessing
 from multiprocessing import Queue, Pool
+import os
 
 from speech import SpeechHandler
 from vision import VisionHandler
 
 app = Flask(__name__)
 app.config['DEBUG'] = True
+credential_path = "./UofT2019-37c5ae888676.json"
+os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = credential_path
 
 # turn the flask app into a socketio app
 socketio = SocketIO(app)
@@ -53,10 +56,10 @@ def test_connect():
     print('Client connected')
 
     # #Start the random number generator thread only if the thread has not been started before.
-    # if not speech_thread.isAlive():
-    #     print("Starting Thread")
-    #     speech_thread = SpeechThread()
-    #     speech_thread.start()
+    if not speech_thread.isAlive():
+        print("Starting Thread")
+        speech_thread = SpeechThread()
+        speech_thread.start()
     # if not vision_thread.isAlive():
     #     print("Starting Thread")
     #     vision_thread = VisionThread()
