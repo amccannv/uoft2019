@@ -92,7 +92,7 @@ class SpeechHandler(object):
                 with open('scores.txt', 'r') as f:
                     lines = f.read().splitlines()
                     line = lines[-1]
-                self._socket.emit('newnumber', {'number': line}, namespace='/test')
+                # self._socket.emit('newnumber', {'number': line}, namespace='/test')
 
                 if re.search(r'\b(exit|quit)\b', transcript, re.I):
                     print('Exiting..')
@@ -114,10 +114,9 @@ class SpeechHandler(object):
 
         return crutch_word_count / len(transcript.split()) * 100
 
-    def __init__(self, socket):
+    def __init__(self):
         # See http://g.co/cloud/speech/docs/languages
         # for a list of supported languages.
-        self._socket = socket
         self._json_summary = {'transcript': '',
                               'crutch_count_by_line': [],
                               'wpm_by_line': [],
