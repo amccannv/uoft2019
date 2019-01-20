@@ -5,7 +5,7 @@ from time import time, sleep
 from datetime import datetime, timedelta
 import json
 
-from flask import Flask, render_template, redirect, url_for
+from flask import Flask, render_template, redirect, url_for, jsonify
 
 from speech import SpeechHandler
 from vision import VisionHandler
@@ -71,8 +71,19 @@ def summary():
             if int(float(score.strip())) != 0:
                 scores.append(score)
     data['scores'] = scores
-    print('yooooooooooooooooo')
     return render_template('summary.html', data=data)
+
+@app.route('/current', methods=['GET'])
+def current():
+    with open('audio_summary.json') as f:
+        data = json.load(f)
+    scores = []
+    with open('scores.txt') as f:
+        for score in f:
+            if int(float(score.strip())) != 0:
+                scores.append(score)
+    data['scores'] = scores
+    return jsonify(data)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0')
