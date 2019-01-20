@@ -29,6 +29,8 @@ import re
 import sys
 import json
 import subprocess
+from time import time, sleep
+from datetime import datetime, timedelta
 
 from google.cloud import speech
 from google.cloud.speech import enums
@@ -42,6 +44,8 @@ from microphoneStream import MicrophoneStream
 RATE = 16000
 CHUNK = int(RATE / 10)  # 100ms
 CRUTCH_WORDS = ['basically', 'really', 'like', 'actually', 'very', 'literally', 'stuff', 'things', 'obviously', 'yeah']
+
+timeNow = time()
 
 class SpeechHandler(object):
     def listen_print_loop(self, responses):
@@ -89,20 +93,16 @@ class SpeechHandler(object):
 
                 # Exit recognition if any of the transcribed phrases could be
                 # one of our keywords.
-                with open('scores.txt', 'r') as f:
-                    lines = f.read().splitlines()
-                    line = lines[-1]
-                # self._socket.emit('newnumber', {'number': line}, namespace='/test')
+                self.fillerStats(transcript)
 
                 if re.search(r'\b(exit|quit)\b', transcript, re.I):
                     print('Exiting..')
-                    with open('audio_summary.json', 'w') as outfile:
-                        json.dump(self._json_summary, outfile)
                     break
 
                 num_chars_printed = 0
 
     def fillerStats(self, transcript):
+
         crutch_word_count = 0
         for word in CRUTCH_WORDS:
             crutch_word_count = crutch_word_count + transcript.count(word)
@@ -110,7 +110,11 @@ class SpeechHandler(object):
 
         self._json_summary['transcript'] = self._json_summary['transcript'] + transcript
         self._json_summary['crutch_count_by_line'].append(crutch_word_count)
-        self._json_summary['wpm_by_line'].append(0)
+        self._json_summary['wpm_by_line'].append(len(transcript.split()) / (time() - timeNow))
+        timeNow = time()
+
+        with open('audio_summary.json', 'w') as outfile:
+            json.dump(self._json_summary, outfile)
 
         return crutch_word_count / len(transcript.split()) * 100
 
