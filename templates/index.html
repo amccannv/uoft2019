@@ -1,16 +1,12 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <script src="//code.jquery.com/jquery-3.3.1.min.js"></script>
+  <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
   <script src="static/js/application.js"></script>
   <link rel="stylesheet" type="text/css" href="static/css/loading-bar.css"/>
   <link rel="stylesheet" type="text/css" href="static/css/custom.css"/>
-  <script type="text/javascript" src="static/js/loading-bar.js"></script>
-
-  <!-- jQuery library -->
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-
-  <!-- Popper JS -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"></script>
+  <script src="static/js/loading-bar.js"></script>
 </head>
 <body>
 
@@ -23,19 +19,24 @@
 
 <!-- Content -->
 <div class="big-container">
-
   <!-- Cam white spaces -->
   <div class="white-space">
-    white space
   </div>
 
   <!-- Live bars -->
   <div class="live-bars">
-    <div class="ldBar" data-value="50"></div>
+    <div class="ldBar" id="frequency" data-value="50"></div>
     <div class="ldBar" data-value="50"></div>
     <div class="ldBar" data-value="50"></div>
   </div>
 </div>
+
+<div class="footer">
+  yo
+</div>
+
+<div id="log">
+        </div>
 
 </body>
 </html>

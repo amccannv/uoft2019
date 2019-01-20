@@ -1,5 +1,8 @@
+html,
 body {
   height: 100%;
+  margin: 0;
+  overflow: hidden;
 }
 
 .navbar {
@@ -8,8 +11,10 @@ body {
 
 .big-container {
   display: flex;
-  align-items: space-around;
+  align-content: space-around;
   justify-content: space-around;
+  flex-flow: row;
+  height: 80%;
 }
 
 .live-bars {
@@ -18,4 +23,11 @@ body {
   align-items: center;
   justify-content: space-around;
   height: 100%;
+}
+
+.footer {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-content: center;
 }
