@@ -10,7 +10,7 @@ import argparse
 from threading import Thread
 import os
 
-from flask import Flask, request, jsonify
+# from flask import Flask, request, jsonify
 
 def worker(input_q, output_q, cap_params, frame_processed):
     print(">> loading frozen model for worker")
