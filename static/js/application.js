@@ -1,7 +1,7 @@
 $(document).ready(function(){
     //connect to the socket server.
-    var socket = io.connect('http://' + document.domain + ':' + location.port + '/test');
-    var numbers_received = [];
+    // var socket = io.connect('http://' + document.domain + ':' + location.port + '/test');
+    // var numbers_received = [];
 
     //receive details from server
     // socket.on('newnumber', function(msg) {
@@ -17,10 +17,13 @@ $(document).ready(function(){
     //     }
     //     $('#log').html(numbers_string);
     // });
+    console.log("hi");
+    function getScore(){
+        jQuery.get("../../scores.txt", function(data){
+            console.log(data);
+            setTimeout(getScore, 2000);
+        });
+    }
 
-    socket.on('newnumber', function(msg) {
-        with open('scores.txt') as myfile:
-            print (list(myfile)[-1])
-    });
-
+    setTimeout(getScore, 10);
 });

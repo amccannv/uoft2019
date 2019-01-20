@@ -5,3 +5,6 @@ env
 UofT*
 audio_summary.json
 scores.txt
+*.ipynb
+.ipynb_checkpoints
+audio_summary.json

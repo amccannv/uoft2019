@@ -10,7 +10,7 @@ import argparse
 from threading import Thread
 import os
 
-from flask import Flask, request, jsonify
+# from flask import Flask, request, jsonify
 
 def worker(input_q, output_q, cap_params, frame_processed):
     print(">> loading frozen model for worker")
@@ -66,17 +66,10 @@ class VisionHandler(object):
         if os.path.exists('scores.txt'):
             os.remove('scores.txt')
 
-        frame_processed = 0
         score_thresh = 0.2
-        
-        self._input_q = Queue(maxsize=5)
-        self._output_q = Queue(maxsize=5)
-
-        video_capture = WebcamVideoStream(src=0, width=750, height=500).start()
 
         cap_params = {}
         frame_processed = 1
-        cap_params['im_width'], cap_params['im_height'] = video_capture.size()
         cap_params['score_thresh'] = score_thresh
 
         # max number of hands we want to detect/track
@@ -84,39 +77,57 @@ class VisionHandler(object):
 
         # spin up workers to paralleize detection.
         self._pool = Pool(4, worker, (self._input_q, self._output_q, cap_params, frame_processed))
+        cap = cv2.VideoCapture(0)
+        cap.set(cv2.CAP_PROP_FRAME_WIDTH, 750)
+        cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 500)
 
-        cv2.namedWindow('Multi-Threaded Detection', cv2.WINDOW_NORMAL)
+        start_time = datetime.datetime.now()
+        num_frames = 0
+        im_width, im_height = (cap.get(3), cap.get(4))
+        # max number of hands we want to detect/track
+        num_hands_detect = 2
+
+        cv2.namedWindow('Single-Threaded Detection', cv2.WINDOW_NORMAL)
 
         self.detection_loop(video_capture)
 
-    def detection_loop(self, video_capture):
-        num_frames = 0
-        fps = 0
-        index = 0
-        start_time = datetime.datetime.now()
-
         while True:
-            frame = video_capture.read()
+            _, frame = cap.read()
             frame = cv2.flip(frame, 1)
-            index += 1
-
-            self._input_q.put(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
-            output_frame = self._output_q.get()
-            output_frame = cv2.cvtColor(output_frame, cv2.COLOR_RGB2BGR)
+            try:
+                frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            except:
+                print("Error converting to RGB")
 
             elapsed_time = (datetime.datetime.now() - start_time).total_seconds()
             num_frames += 1
             fps = num_frames / elapsed_time
 
-            if output_frame is not None:
-                detector_utils.draw_fps_on_image("FPS : " + str(int(fps)), output_frame)
-                cv2.imshow('Multi-Threaded Detection', output_frame)
-                if cv2.waitKey(1) & 0xFF == ord('q'):
-                    break
-            else:
+            boxes, scores = detector_utils.detect_objects(
+                frame, detection_graph, sess)
+            # draw bounding boxes
+
+            ret = detector_utils.draw_box_on_image(
+                0, cap_params["score_thresh"],
+                scores, boxes, cap_params['im_width'], cap_params['im_height'], frame, num_frames)
+
+
+            if ret is not None:
+                ret1 = ret
+
+            ret = detector_utils.draw_box_on_image(
+                1, cap_params["score_thresh"],
+                scores, boxes, cap_params['im_width'], cap_params['im_height'],
+                frame, frame_processed)
+
+            if ret is not None:
+                ret2 = ret
+
+            score = (ret1 + ret2)/2
+            if ret is not None:
+                print(score)
+
+            detector_utils.draw_fps_on_image("FPS : " + str(int(fps)), output_frame)
+            cv2.imshow('Single-Threaded Detection', output_frame)
+            if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
-        elapsed_time = (datetime.datetime.now() - start_time).total_seconds()
-        fps = num_frames / elapsed_time
-        self._pool.terminate()
-        video_capture.stop()
-        cv2.destroyAllWindows()

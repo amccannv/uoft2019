@@ -1,4 +1,4 @@
-from flask_socketio import SocketIO, emit
+# from flask_socketio import SocketIO, emit
 from flask import Flask, render_template, url_for, copy_current_request_context
 from random import random
 from time import sleep
@@ -16,10 +16,6 @@ app.config['DEBUG'] = True
 credential_path = "./UofT2019-37c5ae888676.json"
 os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = credential_path
 
-# turn the flask app into a socketio app
-socketio = SocketIO(app)
-
-# audio thread
 speech_thread = Thread()
 speech_thread_stop_event = Event()
 
@@ -29,7 +25,7 @@ class SpeechThread(Thread):
         super(SpeechThread, self).__init__()
 
     def run(self):
-        SpeechHandler(socketio)
+        SpeechHandler()
 
 vision_thread = Thread()
 vision_thread_stop_event = Event()
@@ -42,24 +38,26 @@ class VisionThread(Thread):
     def run(self):
         VisionHandler()
 
-
 @app.route('/')
 def index():
-    #only by sending this page first will the client be connected to the socketio instance
     return render_template('index.html')
 
-@socketio.on('connect', namespace='/test')
-def test_connect():
-    # need visibility of the global thread object
+@app.route('/start')
+def start():
     global speech_thread
     global vision_thread
+<<<<<<< HEAD
     print('Client connected')
 
     # #Start the random number generator thread only if the thread has not been started before.
+=======
+    
+>>>>>>> c71ff6c4cb8f451fdda75d455ac74ed6c01048ce
     if not speech_thread.isAlive():
         print("Starting Thread")
         speech_thread = SpeechThread()
         speech_thread.start()
+<<<<<<< HEAD
     # if not vision_thread.isAlive():
     #     print("Starting Thread")
     #     vision_thread = VisionThread()
@@ -68,6 +66,18 @@ def test_connect():
 @socketio.on('disconnect', namespace='/test')
 def test_disconnect():
     print('Client disconnected')
+=======
+    if not vision_thread.isAlive():
+        print("Starting Thread")
+        vision_thread = VisionThread()
+        vision_thread.start()
+
+@app.route('/stop')
+def stop():
+    print('hold')
+    # stop logic
+    # render summary
+>>>>>>> c71ff6c4cb8f451fdda75d455ac74ed6c01048ce
 
 if __name__ == '__main__':
-    socketio.run(app)
+    app.run(host='0.0.0.0')
