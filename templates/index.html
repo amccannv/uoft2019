@@ -7,9 +7,12 @@
 <script src="//code.jquery.com/jquery-3.3.1.min.js"></script>
 <script src="static/js/application.js"></script>
 <link rel="stylesheet" type="text/css" href="ribbon.css" />
+<link rel="stylesheet" type="text/css" href="css/epoch.min.css">
 <script src= "https://cdn.zingchart.com/zingchart.min.js"></script>
 <script> zingchart.MODULESDIR = "https://cdn.zingchart.com/modules/";
 ZC.LICENSE = ["569d52cefae586f634c54f86dc99e6a9","ee6b7db5b51705a13dc2339db3edaf6d"];</script>
+<script src="js/d3.min.js"></script>
+<script src="js/epoch.min.js"></script>
 <!-- <link rel="stylesheet" href="https://www.w3schools.com/lib/w3-theme-teal.css"> -->
 <link rel="stylesheet" href="./static/css/ribbon.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.3.0/css/font-awesome.min.css">
@@ -59,7 +62,7 @@ ZC.LICENSE = ["569d52cefae586f634c54f86dc99e6a9","ee6b7db5b51705a13dc2339db3edaf
             <rect x="0" y="-2" width="30%" height="30%" fill="url(#gradient)" mask="url(#mask)"></rect>
         </svg>
 
-        <h1>In <a href="https://codepen.io/zapplebee/full/gbNbZE/">Full Page view</a>, please allow the use of your microphone</h1>
+        <h1> <a href="https://codepen.io/zapplebee/full/gbNbZE/"></a></h1>
       </div>
 
       <!-- <a href="http://localhost:5000/summary" class="w3-btn w3-xlarge w3-dark-grey w3-hover-light-grey">STOP</a> -->
@@ -99,8 +102,9 @@ ZC.LICENSE = ["569d52cefae586f634c54f86dc99e6a9","ee6b7db5b51705a13dc2339db3edaf
 <div class="w3-third">
   <div class="w3-card w3-container" style="min-height:400px">
     <h3>Speech Speed</h3><br>
-    <img src='./static/img/speed.png' width="175" height="125"/>
-    <p>[put the slider here]</p>
+    <!-- <img src='./static/img/speed.png' width="175" height="125"/> -->
+      <!-- <div id="lineChart" class="epoch category10" style="width: 200px; height: 200px"></div> -->
+    <p id='wpm'>[put the slider here]</p>
   </div>
 </div>
 </div>
@@ -137,7 +141,7 @@ window.onload = function () {
         //https://bugzilla.mozilla.org/show_bug.cgi?id=965483
         //https://support.mozilla.org/en-US/questions/984179
         window.persistAudioStream = stream;
-        h.innerHTML = "Thanks";
+        // h.innerHTML = "Thanks";
         h.setAttribute('style', 'opacity: 0;');
         var audioContent = new AudioContext();
         var audioStream = audioContent.createMediaStreamSource( stream );
@@ -289,6 +293,22 @@ data : myConfig,
 height: 500,
 width: '100%'
 });
+
+// WPM graph
+// update the wpm value!!!
+var element = document.getElementById("wpm");
+element.innerHTML = "New Heading"; // update with value from json
+// var lineChartData = [
+//   // First series
+//   {
+//     label: "Series 1",
+//     values: [{time: 1370044800, y: 100}, {time: 1370044801, y: 1000}]
+//   }
+// ];
+// var lineChartInstance = $('#lineChart').epoch({
+//     type: 'time.line',
+//     data: lineChartData
+//   });
 </script>
 
 </body>
