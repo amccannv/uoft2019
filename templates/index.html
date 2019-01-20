@@ -7,6 +7,7 @@
 <script src="//code.jquery.com/jquery-3.3.1.min.js"></script>
 <script src="static/js/application.js"></script>
 <!-- <link rel="stylesheet" href="https://www.w3schools.com/lib/w3-theme-teal.css"> -->
+<link rel="stylesheet" href="./static/css/ribbon.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.3.0/css/font-awesome.min.css">
 <body>
 
@@ -30,12 +31,33 @@
       </div>
   </div>
   <div class="w3-third">
-    <!-- <i onclick="w3_open()" class="fa fa-bars w3-xlarge w3-button w3-theme"></i>  -->
     <div class="w3-center">
       <h4></h4>
       <button class="w3-btn w3-xlarge w3-dark-grey w3-hover-light-grey" onclick="startThreads()">START</button>
+
+      <button class="w3-btn w3-xlarge w3-dark-grey w3-hover-light-grey" onclick="stopThreads()">STOP</button>
+      <div class="w3-card w3-container" style="min-height:240px">
+        <svg preserveAspectRatio="none" id="visualizer" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+            <defs>
+
+                <mask id="mask">
+                    <g id="maskGroup">
+                  </g>
+                </mask>
+                <linearGradient id="gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" style="stop-color:#cce6ff;stop-opacity:1" />
+                    <stop offset="20%" style="stop-color:#a366ff;stop-opacity:1" />
+                    <stop offset="90%" style="stop-color:#4da6ff;stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#66ffff;stop-opacity:1" />
+                </linearGradient>
+            </defs>
+            <rect x="0" y="-2" width="30%" height="30%" fill="url(#gradient)" mask="url(#mask)"></rect>
+        </svg>
+
+        <h1>In <a href="https://codepen.io/zapplebee/full/gbNbZE/">Full Page view</a>, please allow the use of your microphone</h1>
+      </div>
+
       <a href="http://localhost:5000/summary" class="w3-btn w3-xlarge w3-dark-grey w3-hover-light-grey">STOP</a>
-      <!-- <button class="w3-btn w3-xlarge w3-dark-grey w3-hover-light-grey" onclick="stopThreads()">STOP</button> -->
         <div class="w3-padding-32"></div>
     </div>
   </div>
@@ -51,7 +73,7 @@
 <!-- Crutch Words -->
 <div class="w3-row-padding w3-center w3-margin-top">
   <div class="w3-third">
-    <div class="w3-card w3-container" style="min-height:460px">
+    <div class="w3-card w3-container" style="min-height:400px">
       <h3>Crutch Words</h3><br>
       <img src='./static/img/fillerwords.png' width="175" height="125"/>
       <p>[put the slider here]</p>
@@ -60,7 +82,7 @@
 
  <!-- Movement Analysis -->
 <div class="w3-third">
-  <div class="w3-card w3-container" style="min-height:460px">
+  <div class="w3-card w3-container" style="min-height:400px">
     <h3>Movement Analysis</h3><br>
     <img src='./static/img/movement.png' width="175" height="125"/>
     <p>[put the slider here]</p>
@@ -69,7 +91,7 @@
 
 <!-- WPM -->
 <div class="w3-third">
-  <div class="w3-card w3-container" style="min-height:460px">
+  <div class="w3-card w3-container" style="min-height:400px">
     <h3>Words Per Minute</h3><br>
     <img src='./static/img/speed.png' width="175" height="125"/>
     <p>[put the slider here]</p>
@@ -89,82 +111,151 @@ function startThreads() {
     xhr.open('POST', 'http://localhost:5000/start');
     xhr.send();
 }
+// function stopThreads() {
+//     var xhr = new XMLHttpRequest();
+//     xhr.onreadystatechange = function () {
+//         if (xhr.readyState === 4) {
+//             console.log(xhr.response);
+//         }
+//     }
+//     xhr.open('POST', 'http://localhost:5000/stop');
+//     xhr.send();
+// }
 
-// Side navigation
-function w3_open() {
-  var x = document.getElementById("mySidebar");
-  x.style.width = "100%";
-  x.style.fontSize = "40px";
-  x.style.paddingTop = "10%";
-  x.style.display = "block";
-}
-function w3_close() {
-  document.getElementById("mySidebar").style.display = "none";
-}
+// // Side navigation
+// function w3_open() {
+//   var x = document.getElementById("mySidebar");
+//   x.style.width = "100%";
+//   x.style.fontSize = "40px";
+//   x.style.paddingTop = "10%";
+//   x.style.display = "block";
+// }
+// function w3_close() {
+//   document.getElementById("mySidebar").style.display = "none";
+// }
+//
+// // Tabs
+// function openCity(evt, cityName) {
+//   var i;
+//   var x = document.getElementsByClassName("city");
+//   for (i = 0; i < x.length; i++) {
+//     x[i].style.display = "none";
+//   }
+//   var activebtn = document.getElementsByClassName("testbtn");
+//   for (i = 0; i < x.length; i++) {
+//     activebtn[i].className = activebtn[i].className.replace(" w3-dark-grey", "");
+//   }
+//   document.getElementById(cityName).style.display = "block";
+//   evt.currentTarget.className += " w3-dark-grey";
+// }
+//
+// var mybtn = document.getElementsByClassName("testbtn")[0];
+// mybtn.click();
+//
+// // Accordions
+// function myAccFunc(id) {
+//   var x = document.getElementById(id);
+//   if (x.className.indexOf("w3-show") == -1) {
+//     x.className += " w3-show";
+//   } else {
+//     x.className = x.className.replace(" w3-show", "");
+//   }
+// }
+//
+// // Slideshows
+// var slideIndex = 1;
+//
+// function plusDivs(n) {
+//   slideIndex = slideIndex + n;
+//   showDivs(slideIndex);
+// }
+//
+// function showDivs(n) {
+//   var x = document.getElementsByClassName("mySlides");
+//   if (n > x.length) {slideIndex = 1}
+//   if (n < 1) {slideIndex = x.length} ;
+//   for (i = 0; i < x.length; i++) {
+//     x[i].style.display = "none";
+//   }
+//   x[slideIndex-1].style.display = "block";
+// }
+//
+// showDivs(1);
+//
+// // Progress Bars
+// function move() {
+//   var elem = document.getElementById("myBar");
+//   var width = 5;
+//   var id = setInterval(frame, 10);
+//   function frame() {
+//     if (width == 100) {
+//       clearInterval(id);
+//     } else {
+//       width++;
+//       elem.style.width = width + '%';
+//       elem.innerHTML = width * 1  + '%';
+//     }
+//   }
+// }
 
-// Tabs
-function openCity(evt, cityName) {
-  var i;
-  var x = document.getElementsByClassName("city");
-  for (i = 0; i < x.length; i++) {
-    x[i].style.display = "none";
-  }
-  var activebtn = document.getElementsByClassName("testbtn");
-  for (i = 0; i < x.length; i++) {
-    activebtn[i].className = activebtn[i].className.replace(" w3-dark-grey", "");
-  }
-  document.getElementById(cityName).style.display = "block";
-  evt.currentTarget.className += " w3-dark-grey";
-}
+// audio
+window.onload = function () {
+    "use strict";
+    var paths = document.getElementsByTagName('path');
+    var visualizer = document.getElementById('visualizer');
+    var mask = visualizer.getElementById('mask');
+    var h = document.getElementsByTagName('h1')[0];
+    var path;
+    var report = 0;
 
-var mybtn = document.getElementsByClassName("testbtn")[0];
-mybtn.click();
+    var soundAllowed = function (stream) {
+        //Audio stops listening in FF without // window.persistAudioStream = stream;
+        //https://bugzilla.mozilla.org/show_bug.cgi?id=965483
+        //https://support.mozilla.org/en-US/questions/984179
+        window.persistAudioStream = stream;
+        h.innerHTML = "Thanks";
+        h.setAttribute('style', 'opacity: 0;');
+        var audioContent = new AudioContext();
+        var audioStream = audioContent.createMediaStreamSource( stream );
+        var analyser = audioContent.createAnalyser();
+        audioStream.connect(analyser);
+        analyser.fftSize = 1024;
 
-// Accordions
-function myAccFunc(id) {
-  var x = document.getElementById(id);
-  if (x.className.indexOf("w3-show") == -1) {
-    x.className += " w3-show";
-  } else {
-    x.className = x.className.replace(" w3-show", "");
-  }
-}
+        var frequencyArray = new Uint8Array(analyser.frequencyBinCount);
+        visualizer.setAttribute('viewBox', '0 0 255 255');
 
-// Slideshows
-var slideIndex = 1;
-
-function plusDivs(n) {
-  slideIndex = slideIndex + n;
-  showDivs(slideIndex);
-}
-
-function showDivs(n) {
-  var x = document.getElementsByClassName("mySlides");
-  if (n > x.length) {slideIndex = 1}
-  if (n < 1) {slideIndex = x.length} ;
-  for (i = 0; i < x.length; i++) {
-    x[i].style.display = "none";
-  }
-  x[slideIndex-1].style.display = "block";
-}
-
-showDivs(1);
-
-// Progress Bars
-function move() {
-  var elem = document.getElementById("myBar");
-  var width = 5;
-  var id = setInterval(frame, 10);
-  function frame() {
-    if (width == 100) {
-      clearInterval(id);
-    } else {
-      width++;
-      elem.style.width = width + '%';
-      elem.innerHTML = width * 1  + '%';
+				//Through the frequencyArray has a length longer than 255, there seems to be no
+        //significant data after this point. Not worth visualizing.
+        for (var i = 0 ; i < 255; i++) {
+            path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            path.setAttribute('stroke-dasharray', '4,1');
+            mask.appendChild(path);
+        }
+        var doDraw = function () {
+            requestAnimationFrame(doDraw);
+            analyser.getByteFrequencyData(frequencyArray);
+          	var adjustedLength;
+            for (var i = 0 ; i < 255; i++) {
+              	adjustedLength = Math.floor(frequencyArray[i]) - (Math.floor(frequencyArray[i]) % 5);
+                paths[i].setAttribute('d', 'M '+ (i) +',255 l 0,-' + adjustedLength);
+            }
+        }
+        doDraw();
     }
-  }
-}
+
+    var soundNotAllowed = function (error) {
+        h.innerHTML = "You must allow your microphone.";
+        console.log(error);
+    }
+
+    /*window.navigator = window.navigator || {};
+    /*navigator.getUserMedia =  navigator.getUserMedia       ||
+                              navigator.webkitGetUserMedia ||
+                              navigator.mozGetUserMedia    ||
+                              null;*/
+    navigator.getUserMedia({audio:true}, soundAllowed, soundNotAllowed);
+
+};
 </script>
 
 </body>
