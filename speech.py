@@ -28,13 +28,10 @@ from __future__ import division
 import re
 import sys
 import json
-import subprocess
 
 from google.cloud import speech
-from google.cloud.speech import enums
-from google.cloud.speech import types
+from google.cloud.speech import enums, types
 import pyaudio
-from six.moves import queue
 
 from microphoneStream import MicrophoneStream
 
