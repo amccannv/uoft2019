@@ -37,17 +37,25 @@ body {
 }
 
 .ldBar {
-  display: flex;
+  width: 90% !important;
+  height: 100%;
+}
+
+.ldBar svg {
+  width: 90% !important;
+  height: 100%;
 }
 
 .bar {
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
-  align-content: space-around;
+  justify-content: space-around;
+  align-content: center;
+  width: 100%;
 }
 
 .bar img {
   max-width: 100px;
   max-height: 100px;
+  align-self: left;
 }

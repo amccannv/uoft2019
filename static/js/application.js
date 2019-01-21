@@ -1,29 +1,16 @@
-$(document).ready(function(){
-    //connect to the socket server.
-    // var socket = io.connect('http://' + document.domain + ':' + location.port + '/test');
-    // var numbers_received = [];
-
-    //receive details from server
-    // socket.on('newnumber', function(msg) {
-    //     console.log("Received number" + msg.number);
-    //     //maintain a list of ten numbers
-    //     if (numbers_received.length >= 10){
-    //         numbers_received.shift()
-    //     }            
-    //     numbers_received.push(msg.number);
-    //     numbers_string = '';
-    //     for (var i = 0; i < numbers_received.length; i++){
-    //         numbers_string = numbers_string + '<p>' + numbers_received[i].toString() + '</p>';
-    //     }
-    //     $('#log').html(numbers_string);
-    // });
-    console.log("hi");
-    function getScore(){
-        jQuery.get("../../scores.txt", function(data){
-            console.log(data);
-            setTimeout(getScore, 2000);
-        });
+$(document).ready(function() {
+    function getCurrent() {
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4) {
+                console.log(xhr.response);
+            }
+        }
+        xhr.open('GET', 'http://localhost:5000/current');
+        xhr.send();
+        console.log('hey here')
+        setTimeout(getCurrent, 2000);
     }
 
-    setTimeout(getScore, 10);
+    setTimeout(getCurrent, 2000);
 });
