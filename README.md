@@ -9,3 +9,5 @@ Victor Dibia, Real-time Hand-Detection using Neural Networks (SSD) on Tensorflow
 ## Winner of Google's Best use of Google Cloud API
 
 ## Winner of RBC's Most Creative Solution Challenge
+
+https://devpost.com/software/stage-fight
