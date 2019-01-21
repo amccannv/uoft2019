@@ -1,4 +1,4 @@
-# uoft2019
+# UofT Hacks 2019 Hackathon Submission
 
 ## Docker Setup
 docker run --device=/dev/video0:/dev/video0 -p 5000:5000 -ti -v=$HOME/.config/gcloud:/root/.config/gcloud stagefight
